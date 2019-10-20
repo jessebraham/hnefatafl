@@ -1,0 +1,15 @@
+/* Import all of Tailwind CSS */
+
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+
+/* General */
+
+html, body {
+  @apply h-full w-full;
+}
+body {
+  @apply bg-gray-900 flex items-center justify-center;
+}
