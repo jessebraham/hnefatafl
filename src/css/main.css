@@ -5,6 +5,11 @@
 @import "tailwindcss/utilities";
 
 
+/* Component Styles */
+
+@import "./components/game_board.css";
+
+
 /* General */
 
 html, body {
