@@ -8,6 +8,7 @@
 /* Component Styles */
 
 @import "./components/game_board.css";
+@import "./components/info_panel.css";
 
 
 /* General */

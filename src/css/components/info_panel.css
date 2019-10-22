@@ -1,0 +1,5 @@
+.info-panel {
+  @apply bg-gray-400 flex h-16 items-center justify-between mb-4 px-4;
+  margin-left:  2px;
+  margin-right: 2px;
+}
