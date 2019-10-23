@@ -1,6 +1,6 @@
 import m from "mithril";
 
-import GameState from "../models/GameState";
+import { GameState } from "../models/GameState";
 
 // Info panel component
 export default class InfoPanel {

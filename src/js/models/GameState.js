@@ -1,4 +1,6 @@
-import { Teams, TeamNames } from "../utils";
+// Team "enum" and corresponding human-readable names.
+const Teams = Object.freeze({ ATTACKERS: 0, DEFENDERS: 1 });
+const TeamNames = ["Attackers", "Defenders"];
 
 // Game state object
 const GameState = {
@@ -15,15 +17,16 @@ const GameState = {
     return TeamNames[this.activeTeam];
   },
 
-  advanceTurn() {
-    if (this.activeTeam === Teams.ATTACKERS) {
-      this.activeTeam = Teams.DEFENDERS;
-    } else {
-      this.activeTeam = Teams.ATTACKERS;
-    }
+  inactiveTeam() {
+    return this.activeTeam === Teams.ATTACKERS
+      ? Teams.DEFENDERS
+      : Teams.ATTACKERS;
+  },
 
+  advanceTurn() {
+    this.activeTeam = this.inactiveTeam();
     this.turnsElapsed++;
   },
 };
 
-export default GameState;
+export { GameState, Teams, TeamNames };
