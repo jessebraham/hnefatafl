@@ -1,5 +1,23 @@
 .info-panel {
-  @apply bg-gray-400 flex h-16 items-center justify-between mb-4 px-4;
+  @apply bg-gray-400 flex flex-col justify-between mb-4 px-6 py-4;
   margin-left:  2px;
   margin-right: 2px;
 }
+  .info-panel> div {
+    @apply flex justify-between;
+  }
+    .info-panel div p {
+      @apply flex flex-col mb-6;
+    }
+      .info-panel div p:last-child {
+        @apply mb-0;
+      }
+      .info-panel p> span:first-of-type {
+        @apply text-sm;
+      }
+      .info-panel a {
+        @apply text-sm;
+      }
+        .info-panel a:hover {
+          @apply underline;
+        }

@@ -24,6 +24,11 @@ const INITIAL_UNIT_POSITIONS = [
 // modified.
 const Units = Object.freeze({ NONE: 0, ATTACKER: 1, DEFENDER: 2, KING: 3 });
 
+// Helper functions
+const clone = obj => {
+  return JSON.parse(JSON.stringify(obj));
+};
+
 // Board state object
 //
 // Tracks the positions of each unit on the game board. Provides a number of
@@ -33,7 +38,8 @@ const Board = {
   activeSquare: null,
 
   initialize() {
-    Board.positions = INITIAL_UNIT_POSITIONS;
+    Board.positions = clone(INITIAL_UNIT_POSITIONS);
+    Board.activeSquare = null;
   },
 
   at(x, y) {
@@ -55,10 +61,10 @@ const Board = {
   },
 
   isRestricted(x, y) {
-    // Only the King can occupy the center and four corner squares
     const max = GAMEBOARD_SIZE - 1;
     const middle = Math.floor(GAMEBOARD_SIZE / 2);
 
+    // Only the King can occupy the center and four corner squares
     return (
       (x === 0 && y === 0) ||
       (x === max && y === 0) ||
