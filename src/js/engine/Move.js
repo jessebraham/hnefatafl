@@ -1,9 +1,9 @@
-import { Board } from "../models/Board";
+import { Board } from "../models";
 
 export default class Move {
   static isValid(to) {
     // Cannot move to an occupied square
-    if (Board.occupied(to.x, to.y)) {
+    if (Board.isOccupied(to.x, to.y)) {
       return false;
     }
 
@@ -20,10 +20,7 @@ export default class Move {
 
     // Only the King can occupy the restricted squares (the center, and the
     // four corner squares)
-    if (
-      Board.isRestricted(to.x, to.y) &&
-      !Board.isKing(Board.activeSquare.x, Board.activeSquare.y)
-    ) {
+    if (Board.isRestricted(to.x, to.y)) {
       return false;
     }
 
@@ -45,7 +42,7 @@ export default class Move {
       const b = Math.max(from.x, to.x);
 
       for (let x = a; x < b; x++) {
-        if (Board.occupied(x, from.y)) {
+        if (Board.isOccupied(x, from.y)) {
           return false;
         }
       }
@@ -54,7 +51,7 @@ export default class Move {
       const b = Math.max(from.y, to.y);
 
       for (let y = a; y < b; y++) {
-        if (Board.occupied(from.x, y)) {
+        if (Board.isOccupied(from.x, y)) {
           return false;
         }
       }

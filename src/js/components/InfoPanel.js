@@ -1,21 +1,17 @@
 import m from "mithril";
 
-import { Board } from "../models/Board";
-import { GameState } from "../models/GameState";
+import { Board, Game } from "../models";
 
 // Helper functions
 const restart = () => {
   Board.initialize();
-  GameState.initialize();
+  Game.initialize();
 };
 
 // Info panel component
 export default class InfoPanel {
   view() {
-    if (GameState.gameOver) {
-      return m(GameOverPanel);
-    }
-    return m(GameActivePanel);
+    return Game.isOver ? m(GameOverPanel) : m(GameActivePanel);
   }
 }
 
@@ -28,11 +24,11 @@ class GameActivePanel {
   view() {
     return m("div", { class: "info-panel" }, [
       m("div", [
-        m("p", [m("span", "Next up"), m("span", GameState.activeTeamName())]),
-        m("p", [m("span", "Turns Elapsed"), m("span", GameState.turnsElapsed)]),
+        m("p", [m("span", "Next up"), m("span", Game.activeTeamName)]),
+        m("p", [m("span", "Turns Elapsed"), m("span", Game.turnsElapsed)]),
       ]),
       m("div", [
-        GameState.actionText(),
+        Game.actionText(),
         m("a", { href: "#", onclick: restart }, "Restart"),
       ]),
     ]);
@@ -50,9 +46,7 @@ class GameOverPanel {
         m(
           "p",
           { class: "flex-1 mb-2 text-center" },
-          GameState.winningTeam !== null
-            ? `${GameState.winningTeamName()} win!`
-            : "Tie!",
+          Game.winningTeam !== null ? `${Game.winningTeamName} win!` : "Tie!",
         ),
         m(
           "a",
