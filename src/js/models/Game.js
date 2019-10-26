@@ -1,9 +1,5 @@
-import { Board, Teams } from "./Board";
-
-// Helper functions
-const teamName = team => {
-  return team === Teams.ATTACKERS ? "Attackers" : "Defenders";
-};
+import { Board } from "./Board";
+import { Team, Teams } from "./Team";
 
 // Game state object
 //
@@ -23,15 +19,7 @@ const Game = {
     this.winningTeam = null;
   },
 
-  get activeTeamName() {
-    return teamName(this.activeTeam);
-  },
-
-  get winningTeamName() {
-    return teamName(this.winningTeam);
-  },
-
-  actionText() {
+  get actionText() {
     // TODO: think of other information to potentially display
     if (Board.activeSquare !== null) {
       const active = Board.activeSquare;
@@ -41,8 +29,7 @@ const Game = {
   },
 
   advanceTurn() {
-    this.activeTeam =
-      this.activeTeam === Teams.ATTACKERS ? Teams.DEFENDERS : Teams.ATTACKERS;
+    this.activeTeam = Team.not(this.activeTeam);
     this.turnsElapsed++;
   },
 };

@@ -1,6 +1,6 @@
 import m from "mithril";
 
-import { Board, Game } from "../models";
+import { Board, Game, Team } from "../models";
 
 // Helper functions
 const restart = () => {
@@ -24,11 +24,11 @@ class GameActivePanel {
   view() {
     return m("div", { class: "info-panel" }, [
       m("div", [
-        m("p", [m("span", "Next up"), m("span", Game.activeTeamName)]),
+        m("p", [m("span", "Next up"), m("span", Team.name(Game.activeTeam))]),
         m("p", [m("span", "Turns Elapsed"), m("span", Game.turnsElapsed)]),
       ]),
       m("div", [
-        Game.actionText(),
+        Game.actionText,
         m("a", { href: "#", onclick: restart }, "Restart"),
       ]),
     ]);
@@ -46,7 +46,9 @@ class GameOverPanel {
         m(
           "p",
           { class: "flex-1 mb-2 text-center" },
-          Game.winningTeam !== null ? `${Game.winningTeamName} win!` : "Tie!",
+          Game.winningTeam !== null
+            ? `${Team.name(Game.winningTeam)} win!`
+            : "Tie!",
         ),
         m(
           "a",

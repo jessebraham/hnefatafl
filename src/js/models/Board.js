@@ -5,7 +5,7 @@ const GAMEBOARD_SIZE = 11;
 
 // Initial unit positions
 //
-// Values correspond to those defined by Units below.
+// Values correspond to those defined by Units.
 const INITIAL_UNIT_POSITIONS = [
   [0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
   [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
@@ -20,8 +20,7 @@ const INITIAL_UNIT_POSITIONS = [
   [0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
 ];
 
-// Team and unit type "enums"
-const Teams = Object.freeze({ ATTACKERS: 0, DEFENDERS: 1 });
+// Unit type "enum"
 const Units = Object.freeze({ NONE: 0, ATTACKER: 1, DEFENDER: 2, KING: 3 });
 
 // Board state object
@@ -43,11 +42,21 @@ const Board = {
     return GAMEBOARD_SIZE;
   },
 
+  get corners() {
+    return {
+      topLeft: { x: 0, y: 0 },
+      topRight: { x: this.size - 1, y: 0 },
+      bottomRight: { x: this.size - 1, y: this.size - 1 },
+      bottomLeft: { x: 0, y: this.size - 1 },
+    };
+  },
+
   moveUnit(x, y) {
     const from = this.activeSquare;
     const unit = this.positions[from.y][from.x];
 
     this.removeUnit(from.x, from.y);
+    this.activeSquare = null;
     this.positions[y][x] = unit;
   },
 
@@ -62,24 +71,6 @@ const Board = {
       bottom: y === Board.size - 1 ? null : { x, y: y + 1 },
       left: x === 0 ? null : { x: x - 1, y },
     };
-  },
-
-  belongsTo(x, y, team) {
-    return team === Teams.ATTACKERS
-      ? this.isAttacker(x, y)
-      : this.isDefender(x, y);
-  },
-
-  isActive(x, y) {
-    return (
-      this.activeSquare !== null &&
-      this.activeSquare.x === x &&
-      this.activeSquare.y === y
-    );
-  },
-
-  isOccupied(x, y) {
-    return this.positions[y][x] !== Units.NONE;
   },
 
   isRestricted(me, x, y) {
@@ -101,14 +92,22 @@ const Board = {
     return throne || this.isCorner(x, y);
   },
 
-  isCorner(x, y) {
-    const max = GAMEBOARD_SIZE - 1;
+  isActive(x, y) {
     return (
-      (x === 0 && y === 0) ||
-      (x === max && y === 0) ||
-      (x === 0 && y === max) ||
-      (x === max && y === max)
+      this.activeSquare !== null &&
+      this.activeSquare.x === x &&
+      this.activeSquare.y === y
     );
+  },
+
+  isCorner(x, y) {
+    Object.values(this.corners).some(
+      corner => corner.x === x && corner.y === y,
+    );
+  },
+
+  isOccupied(x, y) {
+    return this.positions[y][x] !== Units.NONE;
   },
 
   isAttacker(x, y) {
@@ -124,4 +123,4 @@ const Board = {
   },
 };
 
-export { Board, Teams };
+export { Board };

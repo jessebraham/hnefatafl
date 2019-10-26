@@ -1,8 +1,7 @@
 import m from "mithril";
 
-import Capture from "../engine/Capture";
-import Move from "../engine/Move";
-import { Board, Game } from "../models";
+import { Capture, Move } from "../engine";
+import { Board, Game, Unit } from "../models";
 
 // Helper functions
 const parseIntFromClass = elem => {
@@ -21,25 +20,21 @@ export default class GameBoard {
     const x = parseIntFromClass(e.target);
     const y = parseIntFromClass(e.target.parentElement);
 
+    // 1. If the square clicked is the active square, deselect it
+    // 2. If the square clicked belongs to the active team, select it
+    // 3. If moving the active unit to the clicked square is valid...
+    //    a. move the unit and deselect the active square
+    //    b. check if any units were captured as a result of this move, removing
+    //       any that were
+    //    c. check if the game has completed, setting the winner if it has and
+    //       advancing to the next turn if it has not
     if (Board.isActive(x, y)) {
-      // If the square clicked is the active square, deselect it.
       Board.activeSquare = null;
-    } else if (Board.belongsTo(x, y, Game.activeTeam)) {
-      // If the square clicked belongs to the active team, select it.
+    } else if (Unit.belongsTo({ x, y }, Game.activeTeam)) {
       Board.activeSquare = { x, y };
     } else if (Move.isValid({ x, y })) {
-      // If the move from the active square to the clicked square is valid,
-      // perform the move and deselect the active square.
       Board.moveUnit(x, y);
-      Board.activeSquare = null;
-
-      // Check the board for captures, eliminating any units who are captured.
-      const captures = Capture.findCaptures(x, y);
-      if (captures.length > 0) {
-        captures.forEach(({ x, y }) => Board.removeUnit(x, y));
-      }
-
-      // Advance to the next turn.
+      Capture.findCaptures(x, y).forEach(({ x, y }) => Board.removeUnit(x, y));
       Game.advanceTurn();
     }
   }
@@ -63,7 +58,8 @@ export default class GameBoard {
           .querySelector(`.col-${x}`);
 
         // Set the text of the square, as well as its 'style.fontSize'
-        // attribute. Selected squares have their font size increased.
+        // attribute. Selected squares have their font size increased as a
+        // visual indicator.
         elem.innerText = text;
         elem.style.fontSize = Board.isActive(x, y) ? "1.25rem" : "1rem";
       }
