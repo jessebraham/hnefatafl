@@ -1,5 +1,6 @@
 import m from "mithril";
 
+import Capture from "../engine/Capture";
 import Move from "../engine/Move";
 import { Board, Game } from "../models";
 
@@ -31,6 +32,12 @@ export default class GameBoard {
       // perform the move and deselect the active square.
       Board.moveUnit(x, y);
       Board.activeSquare = null;
+
+      // Check the board for captures, eliminating any units who are captured.
+      const captures = Capture.findCaptures(x, y);
+      if (captures.length > 0) {
+        captures.forEach(({ x, y }) => Board.removeUnit(x, y));
+      }
 
       // Advance to the next turn.
       Game.advanceTurn();

@@ -55,6 +55,15 @@ const Board = {
     this.positions[y][x] = Units.NONE;
   },
 
+  neighbours(x, y) {
+    return {
+      top: y === 0 ? null : { x, y: y - 1 },
+      right: x === Board.size - 1 ? null : { x: x + 1, y },
+      bottom: y === Board.size - 1 ? null : { x, y: y + 1 },
+      left: x === 0 ? null : { x: x - 1, y },
+    };
+  },
+
   belongsTo(x, y, team) {
     return team === Teams.ATTACKERS
       ? this.isAttacker(x, y)
@@ -73,18 +82,17 @@ const Board = {
     return this.positions[y][x] !== Units.NONE;
   },
 
-  isRestricted(x, y) {
+  isRestricted(me, x, y) {
     const middle = Math.floor(GAMEBOARD_SIZE / 2);
     const throne = x === middle && y === middle;
 
     // The king can move anywhere. No squares are considered hostile to him.
-    const unit = this.activeSquare;
-    if (Board.isKing(unit.x, unit.y)) {
+    if (Board.isKing(me.x, me.y)) {
       return false;
     }
 
     // If the throne is occupied, it is not hostile to defenders.
-    if (Board.isDefender(unit.x, unit.y) && Board.isKing(middle, middle)) {
+    if (Board.isDefender(me.x, me.y) && Board.isKing(middle, middle)) {
       return this.isCorner(x, y);
     }
 
