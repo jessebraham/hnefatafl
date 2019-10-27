@@ -1,67 +1,76 @@
-import { Board } from "../models";
+import { Board, Team } from "../models";
 
 // Helper functions
-const areHostile = (me, other) => {
-  if (other === null) {
-    return false;
-  }
-
-  const restricted = Board.isRestricted(me, other.x, other.y);
-  const otherTeam = Board.isAttacker(me.x, me.y)
-    ? Board.isDefender(other.x, other.y)
-    : Board.isAttacker(other.x, other.y);
-
-  return restricted || otherTeam;
-};
-
-const sameTeam = (me, other) => {
-  if (other === null) {
-    return false;
-  }
-  return Board.isAttacker(me.x, me.y)
-    ? Board.isAttacker(other.x, other.y)
-    : Board.isDefender(other.x, other.y);
+const areHostile = (a, b) => {
+  return Board.isRestricted(a, b) || Team.onDifferent(a, b);
 };
 
 // Capture class
 //
-// ???
+// Determines if a moves results in a hostile unit being captured. Multiple
+// captures can occur with a single move.
 export default class Capture {
   static findCaptures(x, y) {
-    const neighbours = Board.neighbours(x, y);
-    const hostiles = Object.values(neighbours).filter(neighbour =>
-      areHostile({ x, y }, neighbour),
+    const me = { x, y };
+
+    // Determine which, if any, of the squares neighbouring the current
+    // position are hostile.
+    const neighbours = Board.neighbours(me);
+    const hostiles = Object.values(neighbours).filter(
+      neighbour => neighbour !== null && areHostile(me, neighbour),
     );
-    const captures = hostiles.filter(h => this.isCaptured({ x, y }, h));
-    return captures;
+
+    // Further filter down any hostile squares to those which have been
+    // `me` captured `hostile` approaching by the previous move.
+    return hostiles.filter(hostile => this.isCaptured(hostile));
   }
 
-  static isCaptured(me, hostile) {
-    return (
-      this.isHorizontalCapture(me, hostile) ||
-      this.isVerticalCapture(me, hostile)
-    );
+  static isCaptured(hostile) {
+    const horizontal = this.isHorizontallyCaptured(hostile);
+    const vertical = this.isVerticallyCaptured(hostile);
+
+    // If the hostile unit is the King, he must be captured horizontally *and*
+    // vertically.
+    if (Board.isKing(hostile.x, hostile.y)) {
+      return horizontal && vertical;
+    }
+
+    // All remaining units must be captured either horizontally or vertically.
+    return horizontal || vertical;
   }
 
-  static isHorizontalCapture(me, hostile) {
-    const neighbours = Board.neighbours(hostile.x, hostile.y);
-
-    // captured from the left (M -> H)
-    const leftCapture = hostile.x > me.x && sameTeam(me, neighbours.right);
-    // captured from the right (M <- H)
-    const rightCapture = hostile.x < me.x && sameTeam(me, neighbours.left);
-
-    return leftCapture || rightCapture;
+  static isHorizontallyCaptured(unit) {
+    const { left, right } = Board.neighbours(unit);
+    return this.isDirectionallyCaptured(unit, left, right);
   }
 
-  static isVerticalCapture(me, hostile) {
-    const neighbours = Board.neighbours(hostile.x, hostile.y);
+  static isVerticallyCaptured(unit) {
+    const { top, bottom } = Board.neighbours(unit);
+    return this.isDirectionallyCaptured(unit, top, bottom);
+  }
 
-    // captured from the top (M v H)
-    const topCapture = hostile.y > me.y && sameTeam(me, neighbours.bottom);
-    // captured from the bottom (M ^ H)
-    const bottomCapture = hostile.y < me.y && sameTeam(me, neighbours.top);
+  static isDirectionallyCaptured(unit, a, b) {
+    // `a` or `b` being null means the units is at one of the board edges, so
+    // the unit cannot be captured.
+    if (a === null || b === null) {
+      return false;
+    }
 
-    return topCapture || bottomCapture;
+    // If either `a` or `b` are on the same team as the unit, the unit cannot
+    // be captured.
+    if (Team.onSame(unit, a) || Team.onSame(unit, b)) {
+      return false;
+    }
+
+    // If either `a` or `b` are unoccupied and are not restricted squares, the
+    // unit cannot be captured.
+    if (
+      (!Board.isOccupied(a.x, a.y) && !Board.isRestricted(unit, a)) ||
+      (!Board.isOccupied(b.x, b.y) && !Board.isRestricted(unit, b))
+    ) {
+      return false;
+    }
+
+    return true;
   }
 }

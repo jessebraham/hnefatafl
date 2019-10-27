@@ -22,7 +22,7 @@ export default class Move {
     // four corner squares)
     // `Board.isRestricted` checks the unit type, so in turn nothing is ever
     // restricted for the King.
-    if (Board.isRestricted(from, to.x, to.y)) {
+    if (Board.isRestricted(from, to)) {
       return false;
     }
 

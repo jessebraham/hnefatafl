@@ -64,7 +64,7 @@ const Board = {
     this.positions[y][x] = Units.NONE;
   },
 
-  neighbours(x, y) {
+  neighbours({ x, y }) {
     return {
       top: y === 0 ? null : { x, y: y - 1 },
       right: x === Board.size - 1 ? null : { x: x + 1, y },
@@ -73,17 +73,17 @@ const Board = {
     };
   },
 
-  isRestricted(me, x, y) {
+  isRestricted(unit, { x, y }) {
     const middle = Math.floor(GAMEBOARD_SIZE / 2);
     const throne = x === middle && y === middle;
 
     // The king can move anywhere. No squares are considered hostile to him.
-    if (Board.isKing(me.x, me.y)) {
+    if (Board.isKing(unit.x, unit.y)) {
       return false;
     }
 
     // If the throne is occupied, it is not hostile to defenders.
-    if (Board.isDefender(me.x, me.y) && Board.isKing(middle, middle)) {
+    if (Board.isDefender(unit.x, unit.y) && Board.isKing(middle, middle)) {
       return this.isCorner(x, y);
     }
 
@@ -101,7 +101,7 @@ const Board = {
   },
 
   isCorner(x, y) {
-    Object.values(this.corners).some(
+    return Object.values(this.corners).some(
       corner => corner.x === x && corner.y === y,
     );
   },

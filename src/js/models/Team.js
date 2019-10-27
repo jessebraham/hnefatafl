@@ -5,12 +5,30 @@ const Teams = Object.freeze({ ATTACKERS: 0, DEFENDERS: 1 });
 
 // Team model object
 const Team = {
+  teamOf(unit) {
+    const { x, y } = unit;
+    if (Board.isAttacker(x, y)) {
+      return Teams.ATTACKERS;
+    } else if (Board.isDefender(x, y)) {
+      return Teams.DEFENDERS;
+    }
+    return null;
+  },
+
   name(team) {
     return team === Teams.ATTACKERS ? "Attackers" : "Defenders";
   },
 
   not(team) {
     return team === Teams.ATTACKERS ? Teams.DEFENDERS : Teams.ATTACKERS;
+  },
+
+  onSame(team, other) {
+    return this.teamOf(team) === this.teamOf(other);
+  },
+
+  onDifferent(team, other) {
+    return !this.onSame(team, other);
   },
 };
 
