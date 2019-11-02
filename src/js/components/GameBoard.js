@@ -1,7 +1,7 @@
 import m from "mithril";
 
 import { Capture, Completion, Move } from "../engine";
-import { Board, Game, Unit } from "../models";
+import { Board, Game, Team } from "../models";
 
 // Helper functions
 const parseIntFromClass = elem => {
@@ -30,7 +30,7 @@ export default class GameBoard {
     //       advancing to the next turn if it has not
     if (Board.isActive(x, y)) {
       Board.activeSquare = null;
-    } else if (Unit.belongsTo({ x, y }, Game.activeTeam)) {
+    } else if (Team.isOnTeam({ x, y }, Game.activeTeam)) {
       Board.activeSquare = { x, y };
     } else if (Move.isValid({ x, y })) {
       Board.moveUnit(x, y);

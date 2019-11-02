@@ -1,5 +1,4 @@
 import { Board } from "./Board";
-import { Game } from "./Game";
-import { Team, Teams, Unit } from "./Team";
+import { Game, Team, Teams } from "./Game";
 
-export { Board, Game, Team, Teams, Unit };
+export { Board, Game, Team, Teams };
