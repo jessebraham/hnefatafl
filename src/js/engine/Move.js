@@ -1,14 +1,14 @@
 import { Board } from "../models";
 
+// Move class
 export default class Move {
-  static isValid(to) {
+  static isValid(from, to) {
     // Cannot move to an occupied square
     if (Board.isOccupied(to.x, to.y)) {
       return false;
     }
 
     // Movement must be along either of the horizontal or vertical axes
-    const from = Board.activeSquare;
     if (!(Move.isHorizontal(from, to) || Move.isVertical(from, to))) {
       return false;
     }

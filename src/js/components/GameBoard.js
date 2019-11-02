@@ -32,7 +32,7 @@ export default class GameBoard {
       Board.activeSquare = null;
     } else if (Team.isOnTeam({ x, y }, Game.activeTeam)) {
       Board.activeSquare = { x, y };
-    } else if (Move.isValid({ x, y })) {
+    } else if (Move.isValid(Board.activeSquare, { x, y })) {
       Board.moveUnit(x, y);
 
       Capture.findCaptures(x, y)

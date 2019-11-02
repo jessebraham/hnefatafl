@@ -150,6 +150,10 @@ const Board = {
     );
   },
 
+  isEdge(x, y) {
+    return x === 0 || x === this.size - 1 || y === 0 || y === this.size - 1;
+  },
+
   isOccupied(x, y) {
     return this.positions[y][x] !== Units.NONE;
   },

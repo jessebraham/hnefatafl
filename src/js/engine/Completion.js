@@ -1,4 +1,4 @@
-import { Capture, Move } from ".";
+import { Capture, Graph, Move } from ".";
 import { Board, Game, Teams } from "../models";
 
 // Helper functions
@@ -7,6 +7,7 @@ const completeGame = (winner = null) => {
   Game.winningTeam = winner;
 };
 
+// Game completion class
 export default class Completion {
   static get gameHasCompleted() {
     // The following function calls *all* have the potential to mutate Game's
@@ -14,6 +15,7 @@ export default class Completion {
     this.checkCornersForKing();
     this.checkKingIsSurrounded();
     this.checkIfTeamsCanMove();
+    this.checkIfDefendersSurrounded();
 
     return Game.isOver;
   }
@@ -48,6 +50,34 @@ export default class Completion {
       completeGame(Teams.ATTACKERS);
     } else if (defendersCanMove && !attackersCanMove) {
       completeGame(Teams.DEFENDERS);
+    }
+  }
+
+  static checkIfDefendersSurrounded() {
+    // Construct a graph and add all board squares as its vertices.
+    const graph = new Graph(Board.size * Board.size);
+    Board.coordinates.forEach(vertex => graph.addVertex(vertex));
+
+    // Create edges between each neighbouring square.
+    Board.coordinates.forEach(vertex => {
+      Object.values(Board.neighbours(vertex))
+        .filter(neighbour => !!neighbour)
+        .forEach(neighbour => graph.addEdge(vertex, neighbour));
+    });
+
+    // Perform a BFS starting from each defender's position, trying to reach
+    // a board edge. If any piece can reach the board edge, then the defenders
+    // have not be surrounded.
+    let canEscape = false;
+    Board.defenders.forEach(({ x, y }) => {
+      if (graph.bfs({ x, y })) {
+        canEscape = true;
+      }
+    });
+
+    // If the defenders cannot escape, the attackers win.
+    if (!canEscape) {
+      completeGame(Teams.ATTACKERS);
     }
   }
 }
