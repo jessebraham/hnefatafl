@@ -1,6 +1,6 @@
 import m from "mithril";
 
-import { Capture, Move } from "../engine";
+import { Capture, Completion, Move } from "../engine";
 import { Board, Game, Unit } from "../models";
 
 // Helper functions
@@ -17,8 +17,8 @@ export default class GameBoard {
   clickHandler(e) {
     // Use the cell's and row's classes to determine the (x, y) coordinates of
     // the square.
-    const x = parseIntFromClass(e.target);
-    const y = parseIntFromClass(e.target.parentElement);
+    const x = parseIntFromClass(e.target); // <td>
+    const y = parseIntFromClass(e.target.parentElement); // <tr>
 
     // 1. If the square clicked is the active square, deselect it
     // 2. If the square clicked belongs to the active team, select it
@@ -34,14 +34,20 @@ export default class GameBoard {
       Board.activeSquare = { x, y };
     } else if (Move.isValid({ x, y })) {
       Board.moveUnit(x, y);
-      Capture.findCaptures(x, y).forEach(({ x, y }) => Board.removeUnit(x, y));
-      Game.advanceTurn();
+
+      Capture.findCaptures(x, y)
+        .filter(({ x, y }) => !Board.isKing(x, y))
+        .forEach(({ x, y }) => Board.removeUnit(x, y));
+
+      if (!Completion.gameHasCompleted) {
+        Game.advanceTurn();
+      }
     }
   }
 
   drawUnits() {
-    for (let y = 0; y < Board.size; y++) {
-      for (let x = 0; x < Board.size; x++) {
+    range(Board.size).forEach(y =>
+      range(Board.size).forEach(x => {
         // Unoccupied squares have no text.
         // Occupied squres have different icons for each unit type.
         let text = "";
@@ -62,8 +68,8 @@ export default class GameBoard {
         // visual indicator.
         elem.innerText = text;
         elem.style.fontSize = Board.isActive(x, y) ? "1.25rem" : "1rem";
-      }
-    }
+      }),
+    );
   }
 
   oncreate() {

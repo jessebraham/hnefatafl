@@ -2,7 +2,9 @@ import { Board, Team } from "../models";
 
 // Helper functions
 const areHostile = (a, b) => {
-  return Board.isRestricted(a, b) || Team.onDifferent(a, b);
+  return Board.isOccupied(b.x, b.y)
+    ? Board.isRestricted(a, b) || Team.onDifferent(a, b)
+    : Board.isRestricted(a, b);
 };
 
 // Capture class
