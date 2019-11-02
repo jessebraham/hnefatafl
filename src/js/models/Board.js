@@ -23,6 +23,11 @@ const INITIAL_UNIT_POSITIONS = [
 // Unit type "enum"
 const Units = Object.freeze({ NONE: 0, ATTACKER: 1, DEFENDER: 2, KING: 3 });
 
+// Helper functions
+const range = size => {
+  return [...Array(size).keys()];
+};
+
 // Board state object
 //
 // Tracks the positions of each unit on the game board. Provides a number of
@@ -32,17 +37,32 @@ const Board = {
   activeSquare: null,
 
   initialize() {
-    // Clone the initial unit positions array, as it gets mutated if we try to
-    // directly assign it.
+    // Clone the initial unit positions array, as it gets mutated by gameplay
+    // if we try to directly assign it.
     this.positions = JSON.parse(JSON.stringify(INITIAL_UNIT_POSITIONS));
     this.activeSquare = null;
   },
+
+  //
+  // read-only properties
+  //
 
   get size() {
     return GAMEBOARD_SIZE;
   },
 
+  get coordinates() {
+    return range(this.size)
+      .map(y =>
+        range(this.size).map(x => {
+          return { x, y };
+        }),
+      )
+      .flat();
+  },
+
   get corners() {
+    // The four corners of the board (restricted squares).
     return {
       topLeft: { x: 0, y: 0 },
       topRight: { x: this.size - 1, y: 0 },
@@ -51,12 +71,33 @@ const Board = {
     };
   },
 
+  get attackers() {
+    return this.coordinates.filter(({ x, y }) => this.isAttacker(x, y));
+  },
+
+  get defenders() {
+    return this.coordinates.filter(({ x, y }) => this.isDefender(x, y));
+  },
+
+  get king() {
+    const coords = this.coordinates.filter(({ x, y }) => this.isKing(x, y));
+    return coords.length > 0 ? coords[0] : null;
+  },
+
+  //
+  // public methods
+  //
+
   moveUnit(x, y) {
+    // Store the type of unit occupying the active square.
     const from = this.activeSquare;
     const unit = this.positions[from.y][from.x];
 
+    // Remove the unit occupying the active square and deselect it.
     this.removeUnit(from.x, from.y);
     this.activeSquare = null;
+
+    // Place the unit at the new position.
     this.positions[y][x] = unit;
   },
 
@@ -65,6 +106,8 @@ const Board = {
   },
 
   neighbours({ x, y }) {
+    // Return an array of neighbouring squares (ie. left, right, top, bottom)
+    // relative to the provided coordinate.
     return {
       top: y === 0 ? null : { x, y: y - 1 },
       right: x === Board.size - 1 ? null : { x: x + 1, y },
@@ -78,8 +121,9 @@ const Board = {
     const throne = x === middle && y === middle;
 
     // The king can move anywhere. No squares are considered hostile to him.
+    // However when the king is beside the throne, it is considered hostile.
     if (Board.isKing(unit.x, unit.y)) {
-      return false;
+      return throne;
     }
 
     // If the throne is occupied, it is not hostile to defenders.

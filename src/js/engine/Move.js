@@ -30,6 +30,15 @@ export default class Move {
     return true;
   }
 
+  static canMove(x, y) {
+    return Object.values(Board.neighbours({ x, y })).some(
+      neighbour =>
+        neighbour !== null &&
+        !Board.isOccupied(neighbour.x, neighbour.y) &&
+        !Board.isRestricted({ x, y }, neighbour),
+    );
+  }
+
   static isHorizontal(from, to) {
     return from.y === to.y;
   }
