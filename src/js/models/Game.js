@@ -49,6 +49,11 @@ const Game = {
     this.winningTeam = null;
   },
 
+  end(winner = null) {
+    Game.isOver = true;
+    Game.winningTeam = winner;
+  },
+
   advanceTurn() {
     this.activeTeam = Team.not(this.activeTeam);
     this.turnsElapsed++;

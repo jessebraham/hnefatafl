@@ -1,12 +1,6 @@
 import { Capture, Graph, Move } from ".";
 import { Board, Game, Teams } from "../models";
 
-// Helper functions
-const completeGame = (winner = null) => {
-  Game.isOver = true;
-  Game.winningTeam = winner;
-};
-
 // Game completion class
 export default class Completion {
   static get gameHasCompleted() {
@@ -21,19 +15,18 @@ export default class Completion {
   }
 
   static checkCornersForKing() {
-    if (
-      Object.values(Board.corners).some(corner =>
-        Board.isKing(corner.x, corner.y),
-      )
-    ) {
-      completeGame(Teams.DEFENDERS);
+    const kingIsOccupyingCorner = Object.values(Board.corners).some(corner =>
+      Board.isKing(corner.x, corner.y),
+    );
+    if (kingIsOccupyingCorner) {
+      Game.end(Teams.DEFENDERS);
     }
   }
 
   static checkKingIsSurrounded() {
     const middle = Math.floor(Board.size / 2);
     if (!Board.isKing(middle, middle) && Capture.isCaptured(Board.king)) {
-      completeGame(Teams.ATTACKERS);
+      Game.end(Teams.ATTACKERS);
     }
   }
 
@@ -44,18 +37,19 @@ export default class Completion {
     const defendersCanMove = Board.defenders.some(({ x, y }) =>
       Move.canMove(x, y),
     );
+
     if (!attackersCanMove && !defendersCanMove) {
-      completeGame(); // Tie
+      Game.end(); // Tie
     } else if (attackersCanMove && !defendersCanMove) {
-      completeGame(Teams.ATTACKERS);
+      Game.end(Teams.ATTACKERS);
     } else if (defendersCanMove && !attackersCanMove) {
-      completeGame(Teams.DEFENDERS);
+      Game.end(Teams.DEFENDERS);
     }
   }
 
   static checkIfDefendersSurrounded() {
     // Construct a graph and add all board squares as its vertices.
-    const graph = new Graph(Board.size * Board.size);
+    const graph = new Graph();
     Board.coordinates.forEach(vertex => graph.addVertex(vertex));
 
     // Create edges between each neighbouring square.
@@ -77,7 +71,7 @@ export default class Completion {
 
     // If the defenders cannot escape, the attackers win.
     if (!canEscape) {
-      completeGame(Teams.ATTACKERS);
+      Game.end(Teams.ATTACKERS);
     }
   }
 }
