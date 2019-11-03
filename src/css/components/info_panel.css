@@ -1,23 +1,30 @@
 .info-panel {
   @apply bg-gray-400 flex flex-col justify-between mb-4 px-6 py-4;
+  /* Add margins to account for cell borders */
   margin-left:  2px;
   margin-right: 2px;
 }
-  .info-panel> div {
+
+  .info-panel > div {
     @apply flex justify-between;
   }
-    .info-panel div p {
-      @apply flex flex-col mb-6;
+
+  .info-panel div p {
+    @apply flex flex-col mb-6;
+  }
+
+    .info-panel div p:last-child {
+      @apply mb-0;
     }
-      .info-panel div p:last-child {
-        @apply mb-0;
-      }
-      .info-panel p> span:first-of-type {
-        @apply text-sm;
-      }
-      .info-panel a {
-        @apply text-sm;
-      }
-        .info-panel a:hover {
-          @apply underline;
-        }
+
+  .info-panel p > span:first-of-type {
+    @apply border-b-2 border-gray-800 font-semibold mb-1 text-gray-800 text-sm uppercase;
+  }
+
+  .info-panel a {
+    @apply border-b-2 border-transparent mb-px text-gray-800;
+  }
+
+    .info-panel a:hover {
+      @apply border-gray-800;
+    }

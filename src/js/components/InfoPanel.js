@@ -29,7 +29,7 @@ class GameActivePanel {
       ]),
       m("div", [
         Game.actionText,
-        m("a", { href: "#", onclick: restart }, "Restart"),
+        m("a", { href: "#", onclick: restart, class: "uppercase" }, "Restart"),
       ]),
     ]);
   }
@@ -42,23 +42,23 @@ class GameActivePanel {
 class GameOverPanel {
   view() {
     return m("div", { class: "info-panel" }, [
-      m("div", { class: "flex-col" }, [
+      m("div", { class: "flex flex-col justify-between" }, [
         m(
           "p",
-          { class: "flex-1 mb-2 text-center" },
+          {
+            class: "flex-1 font-light mb-2 text-center text-2xl tracking-wide",
+          },
           Game.winningTeam !== null
             ? `${Team.name(Game.winningTeam)} win!`
             : "Tie!",
         ),
-        m(
-          "a",
-          {
-            href: "#",
-            onclick: restart,
-            class: "flex-1 text-center text-lg hover:underline",
-          },
-          "Restart",
-        ),
+        m("div", { class: "flex-1 text-center" }, [
+          m(
+            "a",
+            { href: "#", onclick: restart, class: "uppercase" },
+            "Restart",
+          ),
+        ]),
       ]),
     ]);
   }

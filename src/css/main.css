@@ -16,6 +16,11 @@
 html, body {
   @apply h-full w-full;
 }
+
 body {
-  @apply bg-gray-900 flex items-center justify-center;
+  @apply bg-gray-900;
+}
+
+#app {
+  @apply flex h-full items-center justify-center;
 }

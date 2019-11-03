@@ -1,21 +1,32 @@
 .game-board {
   @apply border-separate select-none;
 }
+
   .game-board tr td {
-    @apply align-middle bg-gray-400 text-center;
-    height: 50px;
-    width:  50px;
+    @apply align-middle bg-gray-400 h-8 text-center w-8;
   }
-  .game-board tr td:hover {
-    @apply cursor-pointer bg-gray-500;
+
+    .game-board tr td.active {
+      @apply bg-gray-500;
+    }
+
+.game-board tr:first-child  td:first-child,
+.game-board tr:first-child  td:last-child,
+.game-board tr:last-child   td:first-child,
+.game-board tr:last-child   td:last-child,
+.game-board tr:nth-child(6) td:nth-child(6) {
+  @apply bg-gray-600;
+}
+
+@media (min-width: 768px) {
+  .game-board tr td {
+    @apply h-10 w-10;
   }
-  .game-board tr:first-child  td:first-child,
-  .game-board tr:first-child  td:last-child,
-  .game-board tr:last-child   td:first-child,
-  .game-board tr:last-child   td:last-child,
-  .game-board tr:nth-child(6) td:nth-child(6) {
-    @apply bg-gray-600;
-  }
+
+    .game-board tr td:hover {
+      @apply bg-gray-500 cursor-pointer;
+    }
+
   .game-board tr:first-child  td:first-child:hover,
   .game-board tr:first-child  td:last-child:hover,
   .game-board tr:last-child   td:first-child:hover,
@@ -23,3 +34,4 @@
   .game-board tr:nth-child(6) td:nth-child(6):hover {
     @apply bg-gray-700;
   }
+}
