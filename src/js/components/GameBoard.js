@@ -2,23 +2,17 @@ import m from "mithril";
 
 import { Capture, Completion, Move } from "../engine";
 import { Board, Game, Team } from "../models";
-
-// Helper functions
-const parseIntFromClass = elem => {
-  return parseInt(elem.classList[0].split("-")[1], 10);
-};
-
-const range = size => {
-  return [...Array(size).keys()];
-};
+import { getCoordinate, getSquare, range } from "../utils";
 
 // Game board component
 export default class GameBoard {
   clickHandler(e) {
-    // Use the cell's and row's classes to determine the (x, y) coordinates of
-    // the square.
-    const x = parseIntFromClass(e.target); // <td>
-    const y = parseIntFromClass(e.target.parentElement); // <tr>
+    // If no square is selected and an empty square is clicked, we do nothing
+    // and return early.
+    const { x, y } = getCoordinate(e.target);
+    if (Board.activeSquare === null && !Board.isOccupied(x, y)) {
+      return;
+    }
 
     // 1. If the square clicked is the active square, deselect it
     // 2. If the square clicked belongs to the active team, select it
@@ -29,16 +23,19 @@ export default class GameBoard {
     //    c. check if the game has completed, setting the winner if it has and
     //       advancing to the next turn if it has not
     if (Board.isActive(x, y)) {
-      Board.activeSquare = null;
+      Board.setActive(null);
     } else if (Team.isOnTeam({ x, y }, Game.activeTeam)) {
-      Board.activeSquare = { x, y };
+      Board.setActive({ x, y });
     } else if (Move.isValid(Board.activeSquare, { x, y })) {
       Board.moveUnit(x, y);
 
+      // Remove any captured units *except* the king, as if he is captured the
+      // game is over (see below).
       Capture.findCaptures(x, y)
         .filter(({ x, y }) => !Board.isKing(x, y))
         .forEach(({ x, y }) => Board.removeUnit(x, y));
 
+      // Keep advancing to the next turn unless the game has ended.
       if (!Completion.gameHasCompleted) {
         Game.advanceTurn();
       }
@@ -46,33 +43,32 @@ export default class GameBoard {
   }
 
   drawUnits() {
-    range(Board.size).forEach(y =>
-      range(Board.size).forEach(x => {
-        // Unoccupied squares have no text.
-        // Occupied squres have different icons for each unit type.
-        let text = "";
-        if (Board.isAttacker(x, y)) {
-          text = "⚔️";
-        } else if (Board.isKing(x, y)) {
-          text = "👑";
-        } else if (Board.isDefender(x, y)) {
-          text = "🛡️";
-        }
+    Board.coordinates.forEach(({ x, y }) => {
+      // Occupied squres have different icons for each unit type. Unoccupied
+      // squares have no text.
+      const elem = getSquare({ x, y });
+      if (Board.isAttacker(x, y)) {
+        elem.innerText = "⚔️";
+      } else if (Board.isKing(x, y)) {
+        elem.innerText = "👑";
+      } else if (Board.isDefender(x, y)) {
+        elem.innerText = "🛡️";
+      } else {
+        elem.innerText = "";
+      }
 
-        const elem = document
-          .querySelector(`.row-${y}`)
-          .querySelector(`.col-${x}`);
-
-        // Set the text of the square, as well as its 'style.fontSize'
-        // attribute. Selected squares have their font size increased as a
-        // visual indicator.
-        elem.innerText = text;
-        elem.style.fontSize = Board.isActive(x, y) ? "1.25rem" : "1rem";
-      }),
-    );
+      // Selected squares have their font size increased as a
+      // visual indicator.
+      elem.style.fontSize = Board.isActive(x, y) ? "1.25rem" : "1rem";
+    });
   }
 
   oncreate() {
+    // Make sure to initialize the Board and Game state objects once the
+    // GameBoard component has been created.
+    Board.initialize();
+    Game.initialize();
+
     this.drawUnits();
   }
 
@@ -85,13 +81,11 @@ export default class GameBoard {
       "table",
       { class: "game-board" },
       range(Board.size).map(y =>
-        m(
-          "tr",
-          { class: `row-${y}` },
+        m("tr", { class: `row-${y}` }, [
           range(Board.size).map(x =>
             m("td", { class: `col-${x}`, onclick: this.clickHandler }),
           ),
-        ),
+        ]),
       ),
     );
   }

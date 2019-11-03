@@ -1,3 +1,5 @@
+import { getSquare, range } from "../utils";
+
 // Width/height of the gameboard (always a square)
 //
 // If this value changes, make sure to update the CSS for the center square!
@@ -22,11 +24,6 @@ const INITIAL_UNIT_POSITIONS = [
 
 // Unit type "enum"
 const Units = Object.freeze({ NONE: 0, ATTACKER: 1, DEFENDER: 2, KING: 3 });
-
-// Helper functions
-const range = size => {
-  return [...Array(size).keys()];
-};
 
 // Board state object
 //
@@ -88,6 +85,17 @@ const Board = {
   // public methods
   //
 
+  setActive(coord) {
+    if (this.activeSquare !== null) {
+      getSquare(this.activeSquare).classList.remove("active");
+    }
+
+    this.activeSquare = coord;
+    if (this.activeSquare !== null) {
+      getSquare(this.activeSquare).classList.add("active");
+    }
+  },
+
   moveUnit(x, y) {
     // Store the type of unit occupying the active square.
     const from = this.activeSquare;
@@ -95,7 +103,7 @@ const Board = {
 
     // Remove the unit occupying the active square and deselect it.
     this.removeUnit(from.x, from.y);
-    this.activeSquare = null;
+    this.setActive(null);
 
     // Place the unit at the new position.
     this.positions[y][x] = unit;

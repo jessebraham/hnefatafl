@@ -1,17 +1,9 @@
 import m from "mithril";
 
-import GameBoard from "../components/GameBoard";
-import InfoPanel from "../components/InfoPanel";
-
-import { Board, Game } from "../models";
+import { GameBoard, InfoPanel } from "../components";
 
 export default class App {
-  oncreate(vnode) {
-    Board.initialize();
-    Game.initialize();
-  }
-
-  view(vnode) {
+  view() {
     return m("div", [m(InfoPanel), m(GameBoard)]);
   }
 }
