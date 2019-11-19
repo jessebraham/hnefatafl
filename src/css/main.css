@@ -5,13 +5,7 @@
 @import "tailwindcss/utilities";
 
 
-/* Component Styles */
-
-@import "./components/game_board.css";
-@import "./components/info_panel.css";
-
-
-/* General */
+/* General styles */
 
 html, body {
   @apply h-full w-full;
@@ -23,4 +17,70 @@ body {
 
 #app {
   @apply flex h-full items-center justify-center;
+}
+
+
+/* Info panel styles */
+
+.info-panel {
+  @apply bg-gray-400 flex flex-col justify-between mb-2 px-6 py-4;
+  /* Add margins to account for table cell borders */
+  margin-left:  2px;
+  margin-right: 2px;
+}
+
+  .info-panel > div {
+    @apply flex justify-between;
+  }
+
+  .info-panel a {
+    @apply text-gray-800 underline;
+  }
+
+    .info-panel a:hover {
+      @apply text-gray-700 no-underline;
+    }
+
+  .info-panel ol li:not(:last-child) {
+    @apply mb-2;
+  }
+
+/* Game board styles */
+
+.game-board {
+  @apply border-separate select-none;
+}
+
+  .game-board tr td {
+    @apply align-middle bg-gray-400 h-8 text-center w-8;
+  }
+
+    .game-board tr td.active {
+      @apply bg-gray-500;
+    }
+
+.game-board tr:first-child  td:first-child,
+.game-board tr:first-child  td:last-child,
+.game-board tr:last-child   td:first-child,
+.game-board tr:last-child   td:last-child,
+.game-board tr:nth-child(6) td:nth-child(6) {
+  @apply bg-gray-600;
+}
+
+@media (min-width: 768px) {
+  .game-board tr td {
+    @apply h-10 w-10;
+  }
+
+    .game-board tr td:hover {
+      @apply bg-gray-500 cursor-pointer;
+    }
+
+  .game-board tr:first-child  td:first-child:hover,
+  .game-board tr:first-child  td:last-child:hover,
+  .game-board tr:last-child   td:first-child:hover,
+  .game-board tr:last-child   td:last-child:hover,
+  .game-board tr:nth-child(6) td:nth-child(6):hover {
+    @apply bg-gray-700;
+  }
 }

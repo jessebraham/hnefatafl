@@ -37,14 +37,12 @@ class Team {
 // mutating game state.
 const Game = {
   activeTeam: 0,
-  turnsElapsed: 0,
   isOver: false,
   winningTeam: null,
 
   initialize() {
     // Attackers always go first!
     this.activeTeam = Teams.ATTACKERS;
-    this.turnsElapsed = 0;
     this.isOver = false;
     this.winningTeam = null;
   },
@@ -56,16 +54,6 @@ const Game = {
 
   advanceTurn() {
     this.activeTeam = Team.not(this.activeTeam);
-    this.turnsElapsed++;
-  },
-
-  get actionText() {
-    // TODO: think of other information to potentially display
-    if (Board.activeSquare !== null) {
-      const active = Board.activeSquare;
-      return `Unit selected at (${active.x}, ${active.y})`;
-    }
-    return "Select a unit";
   },
 };
 
