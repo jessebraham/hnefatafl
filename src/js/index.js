@@ -1,6 +1,10 @@
 import m from "mithril";
 
-import App from "./views/App";
+import { About, App, Rules } from "./views";
 
 const root = document.querySelector("#app");
-m.mount(root, App);
+m.route(root, "/", {
+  "/": App,
+  "/about": About,
+  "/rules": Rules,
+});
