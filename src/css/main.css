@@ -23,7 +23,7 @@ body {
 /* Info panel styles */
 
 .info-panel {
-  @apply bg-gray-400 flex flex-col justify-between mb-2 px-6 py-4;
+  @apply bg-gray-300 flex flex-col justify-between mb-2 px-6 py-4;
   /* Add margins to account for table cell borders */
   margin-left:  2px;
   margin-right: 2px;
@@ -38,7 +38,7 @@ body {
   }
 
     .info-panel a:hover {
-      @apply text-gray-700 no-underline;
+      @apply text-gray-600 no-underline;
     }
 
   .info-panel ol li:not(:last-child) {
@@ -52,11 +52,11 @@ body {
 }
 
   .game-board tr td {
-    @apply align-middle bg-gray-400 h-8 text-center w-8;
+    @apply align-middle bg-gray-300 h-8 text-center w-8;
   }
 
     .game-board tr td.active {
-      @apply bg-gray-500;
+      @apply bg-gray-400;
     }
 
 .game-board tr:first-child  td:first-child,
@@ -73,7 +73,7 @@ body {
   }
 
     .game-board tr td:hover {
-      @apply bg-gray-500 cursor-pointer;
+      @apply bg-gray-400 cursor-pointer;
     }
 
   .game-board tr:first-child  td:first-child:hover,
