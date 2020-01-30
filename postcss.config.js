@@ -4,19 +4,16 @@ const postcssimport = require("postcss-import");
 const purgecss      = require("@fullhuman/postcss-purgecss");
 const tailwindcss   = require("tailwindcss");
 
-
 // Constant flag to indicate whether or not we should build for production.
 const PRODUCTION = process.env.NODE_ENV === "production";
 
 // Custom PurgeCSS extractor for Tailwind that allows special characters in
 // class names.
 //
-// https://github.com/FullHuman/purgecss#extractor
-class TailwindExtractor {
-  static extract(content) {
-    return content.match(/[A-Za-z0-9-_:\/]+/g) || [];
-  }
-}
+// https://purgecss.com/extractors.html#creating-an-extractor
+const tailwindCssExtractor = content => {
+  return content.match(/[A-Za-z0-9-_:\/]+/g) || [];
+};
 
 module.exports = ctx => ({
   map:    ctx.options.map,
@@ -34,7 +31,7 @@ module.exports = ctx => ({
       css: ["./src/**/*.css"],
       extractors: [
         {
-          extractor: TailwindExtractor,
+          extractor: tailwindCssExtractor,
           extensions: ["html", "css", "js"],
         },
       ],
