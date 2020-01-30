@@ -2,18 +2,11 @@ import m from "mithril";
 
 import { Board, Game, Team } from "../models";
 
-// Helper functions
+// Restart the game, re-initializing all game state.
 const restart = () => {
   Board.initialize();
   Game.initialize();
 };
-
-// Info panel component
-export default class InfoPanel {
-  view() {
-    return Game.isOver ? m(GameOverPanel) : m(GameActivePanel);
-  }
-}
 
 // Game active panel component
 //
@@ -22,8 +15,8 @@ export default class InfoPanel {
 class GameActivePanel {
   view() {
     return m("div", { class: "info-panel" }, [
-      m("div", { class: "mb-8" }, [
-        m("span", { class: "flex-1 font-semibold text-lg" }, "Hnefatafl"),
+      m("div", [
+        m("span", { class: "title flex-1" }, "Hnefatafl"),
         m("a", { href: "#!/rules" }, "Rules"),
         m("a", { href: "#!/about", class: "ml-6" }, "About"),
       ]),
@@ -46,9 +39,9 @@ class GameOverPanel {
         m(
           "p",
           { class: "font-light mb-2 text-center text-2xl tracking-wide" },
-          Game.winningTeam !== null
-            ? `${Team.name(Game.winningTeam)} win!`
-            : "Tie!",
+          Game.winningTeam === null
+            ? "Tie!"
+            : `${Team.name(Game.winningTeam)} win!`,
         ),
         m(
           "a",
@@ -57,5 +50,17 @@ class GameOverPanel {
         ),
       ]),
     ]);
+  }
+}
+
+// Info panel component. Essentially just a proxy view for the GameActivePanel
+// and GameOverPanel views defined above.
+export default class InfoPanel {
+  oninit() {
+    restart();
+  }
+
+  view() {
+    return Game.isOver ? m(GameOverPanel) : m(GameActivePanel);
   }
 }

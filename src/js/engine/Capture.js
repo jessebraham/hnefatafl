@@ -1,9 +1,9 @@
 import { Board, Team } from "../models";
 
 // Determine if square `b` is hostile towards square `a`.
-const areHostile = (a, b) => {
+const neighbourIsHostile = (a, b) => {
   return Board.isOccupied(b.x, b.y)
-    ? Board.isRestricted(a, b) || !Team.areOnSame(a, b)
+    ? Board.isRestricted(a, b) || !Team.same(a, b)
     : Board.isRestricted(a, b);
 };
 
@@ -17,7 +17,8 @@ export default class Capture {
     // position are hostile.
     const neighbours = Board.neighbours({ x, y });
     const hostiles = Object.values(neighbours).filter(
-      neighbour => neighbour !== null && areHostile({ x, y }, neighbour),
+      neighbour =>
+        neighbour !== null && neighbourIsHostile({ x, y }, neighbour),
     );
 
     // Further filter down any hostile squares to those which have been
@@ -58,7 +59,7 @@ export default class Capture {
 
     // If either `a` or `b` are on the same team as the unit, the unit cannot
     // be captured.
-    if (Team.areOnSame(unit, a) || Team.areOnSame(unit, b)) {
+    if (Team.same(unit, a) || Team.same(unit, b)) {
       return false;
     }
 

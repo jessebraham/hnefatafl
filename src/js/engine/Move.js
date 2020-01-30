@@ -1,6 +1,6 @@
 import { Board } from "../models";
 
-// Move class
+// Move class, responsible for validating moves performed by units.
 export default class Move {
   static isValid(from, to) {
     // Cannot move to an occupied square
@@ -14,7 +14,7 @@ export default class Move {
     }
 
     // The path between the two squares must be clear of any units
-    if (!Move.hasClearPath(from, to)) {
+    if (!Move.pathIsClear(from, to)) {
       return false;
     }
 
@@ -47,8 +47,9 @@ export default class Move {
     return from.x === to.x;
   }
 
-  static hasClearPath(from, to) {
+  static pathIsClear(from, to) {
     if (Move.isHorizontal(from, to)) {
+      // horizontal move
       const a = Math.min(from.x, to.x) + 1;
       const b = Math.max(from.x, to.x);
 
@@ -58,6 +59,7 @@ export default class Move {
         }
       }
     } else {
+      // vertical move
       const a = Math.min(from.y, to.y) + 1;
       const b = Math.max(from.y, to.y);
 

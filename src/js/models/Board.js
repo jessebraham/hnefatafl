@@ -1,13 +1,12 @@
-import { getSquare, range } from "../utils";
-
 // Width/height of the gameboard (always a square)
 //
-// If this value changes, make sure to update the CSS for the center square!
+// If this value changes, make sure to update the CSS for colouring the center
+// square!
 const GAMEBOARD_SIZE = 11;
 
 // Initial unit positions
 //
-// Values correspond to those defined by Units.
+// Values correspond to those defined by Unit type "enum" below.
 const INITIAL_UNIT_POSITIONS = [
   [0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
   [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
@@ -25,17 +24,48 @@ const INITIAL_UNIT_POSITIONS = [
 // Unit type "enum"
 const Units = Object.freeze({ NONE: 0, ATTACKER: 1, DEFENDER: 2, KING: 3 });
 
+// Extend the Map class and automatically "serialize" the keys.
+class SerializingMap extends Map {
+  set(key, value) {
+    super.set(JSON.stringify(key), value);
+  }
+
+  get(key) {
+    return super.get(JSON.stringify(key));
+  }
+}
+
 // Board state object
 //
 // Tracks the positions of each unit on the game board. Provides a number of
 // helper functions for interacting with the game board.
-const Board = {
+export const Board = {
+  coordinates: [],
+  nodes: null,
   positions: [],
   activeSquare: null,
 
   initialize() {
+    // Construct and store an array of all possible coordinates for the board.
+    this.coordinates = [];
+    for (let y = 0; y < this.size; y++) {
+      for (let x = 0; x < this.size; x++) {
+        this.coordinates.push({ x, y });
+      }
+    }
+
+    // Construct a graph whose vertices are squares on the board and edges are
+    // valid moves between them.
+    this.nodes = new SerializingMap();
+    this.coordinates.forEach(vertex => this.nodes.set(vertex, []));
+    this.coordinates.forEach(vertex => {
+      Object.values(Board.neighbours(vertex))
+        .filter(neighbour => neighbour !== null)
+        .forEach(neighbour => this.nodes.get(vertex).push(neighbour));
+    });
+
     // Clone the initial unit positions array, as it gets mutated by gameplay
-    // if we try to directly assign it.
+    // if we try to directly assign it directly.
     this.positions = JSON.parse(JSON.stringify(INITIAL_UNIT_POSITIONS));
     this.activeSquare = null;
   },
@@ -48,16 +78,6 @@ const Board = {
     return GAMEBOARD_SIZE;
   },
 
-  get coordinates() {
-    return range(this.size)
-      .map(y =>
-        range(this.size).map(x => {
-          return { x, y };
-        }),
-      )
-      .flat();
-  },
-
   get corners() {
     // The four corners of the board (restricted squares).
     return {
@@ -68,35 +88,26 @@ const Board = {
     };
   },
 
-  get attackers() {
-    return this.coordinates.filter(({ x, y }) => this.isAttacker(x, y));
-  },
-
-  get defenders() {
-    return this.coordinates.filter(({ x, y }) => this.isDefender(x, y));
-  },
-
-  get king() {
-    const coords = this.coordinates.filter(({ x, y }) => this.isKing(x, y));
-    return coords.length > 0 ? coords[0] : null;
-  },
-
   //
   // public methods
   //
 
+  getElem({ x, y }) {
+    return document.querySelector(`.row-${y}`).querySelector(`.col-${x}`);
+  },
+
   setActive(coord) {
     if (this.activeSquare !== null) {
-      getSquare(this.activeSquare).classList.remove("active");
+      Board.getElem(this.activeSquare).classList.remove("active");
     }
 
     this.activeSquare = coord;
     if (this.activeSquare !== null) {
-      getSquare(this.activeSquare).classList.add("active");
+      Board.getElem(this.activeSquare).classList.add("active");
     }
   },
 
-  moveUnit(x, y) {
+  moveUnitTo(x, y) {
     // Store the type of unit occupying the active square.
     const from = this.activeSquare;
     const unit = this.positions[from.y][from.x];
@@ -114,8 +125,8 @@ const Board = {
   },
 
   neighbours({ x, y }) {
-    // Return an array of neighbouring squares (ie. left, right, top, bottom)
-    // relative to the provided coordinate.
+    // Return all neighbouring squares (ie. left, right, top, bottom) relative
+    // to the provided coordinate.
     return {
       top: y === 0 ? null : { x, y: y - 1 },
       right: x === Board.size - 1 ? null : { x: x + 1, y },
@@ -178,5 +189,3 @@ const Board = {
     return this.positions[y][x] === Units.KING;
   },
 };
-
-export { Board };

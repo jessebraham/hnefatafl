@@ -2,7 +2,27 @@ import m from "mithril";
 
 import { Capture, Completion, Move } from "../engine";
 import { Board, Game, Team } from "../models";
-import { getCoordinate, getSquare, range } from "../utils";
+
+// Determine the (x, y) coordinates of a given element from the class names of
+// it and its parent row.
+const getCoordinate = elem => {
+  return {
+    x: parseIntFromClass(elem), // <td>
+    y: parseIntFromClass(elem.parentElement), // <tr>
+  };
+};
+
+// Extract the numeric portion of an element's class name. Classes are either
+// 'col-n' or 'row-n', where 'n' is the integer we're extracting.
+const parseIntFromClass = elem => {
+  return parseInt(elem.classList[0].split("-")[1], 10);
+};
+
+// Given the desired size, construct an array containing every value from 0 to
+// `size` - 1.
+const range = size => {
+  return [...Array(size).keys()];
+};
 
 // Game board component
 export default class GameBoard {
@@ -27,7 +47,7 @@ export default class GameBoard {
     } else if (Team.isOnTeam({ x, y }, Game.activeTeam)) {
       Board.setActive({ x, y });
     } else if (Move.isValid(Board.activeSquare, { x, y })) {
-      Board.moveUnit(x, y);
+      Board.moveUnitTo(x, y);
 
       // Remove any captured units *except* the king, as if he is captured the
       // game is over (see below).
@@ -46,7 +66,7 @@ export default class GameBoard {
     Board.coordinates.forEach(({ x, y }) => {
       // Occupied squres have different icons for each unit type. Unoccupied
       // squares have no text.
-      const elem = getSquare({ x, y });
+      const elem = Board.getElem({ x, y });
       if (Board.isAttacker(x, y)) {
         elem.innerText = "⚔️";
       } else if (Board.isKing(x, y)) {

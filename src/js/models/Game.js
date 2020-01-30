@@ -9,15 +9,8 @@ class Team {
     return team === Teams.ATTACKERS ? "Attackers" : "Defenders";
   }
 
-  static not(team) {
-    return team === Teams.ATTACKERS ? Teams.DEFENDERS : Teams.ATTACKERS;
-  }
-
-  static teamOf({ x, y }) {
-    if (!Board.isOccupied(x, y)) {
-      return null;
-    }
-    return Board.isAttacker(x, y) ? Teams.ATTACKERS : Teams.DEFENDERS;
+  static same(a, b) {
+    return this.teamOf(a) === this.teamOf(b);
   }
 
   static isOnTeam({ x, y }, team) {
@@ -26,8 +19,11 @@ class Team {
       : Board.isDefender(x, y);
   }
 
-  static areOnSame(a, b) {
-    return this.teamOf(a) === this.teamOf(b);
+  static teamOf({ x, y }) {
+    if (!Board.isOccupied(x, y)) {
+      return null;
+    }
+    return Board.isAttacker(x, y) ? Teams.ATTACKERS : Teams.DEFENDERS;
   }
 }
 
@@ -36,7 +32,7 @@ class Team {
 // Keep track of the state of an active game, and provide helper functions for
 // mutating game state.
 const Game = {
-  activeTeam: 0,
+  activeTeam: null,
   isOver: false,
   winningTeam: null,
 
@@ -53,7 +49,8 @@ const Game = {
   },
 
   advanceTurn() {
-    this.activeTeam = Team.not(this.activeTeam);
+    this.activeTeam =
+      this.activeTeam === Teams.ATTACKERS ? Teams.DEFENDERS : Teams.ATTACKERS;
   },
 };
 
