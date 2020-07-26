@@ -97,16 +97,16 @@ export default class GameBoard {
   }
 
   view() {
-    return m(
-      "table",
-      { class: "game-board" },
-      range(Board.size).map(y =>
-        m("tr", { class: `row-${y}` }, [
-          range(Board.size).map(x =>
-            m("td", { class: `col-${x}`, onclick: this.clickHandler }),
-          ),
-        ]),
-      ),
+    return (
+      <table class="game-board">
+        {range(Board.size).map(y => (
+          <tr class={`row-${y}`}>
+            {range(Board.size).map(x => (
+              <td class={`col-${x}`} onclick={this.clickHandler}></td>
+            ))}
+          </tr>
+        ))}
+      </table>
     );
   }
 }

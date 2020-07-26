@@ -4,6 +4,11 @@ import { GameBoard, InfoPanel } from "../components";
 
 export default class App {
   view() {
-    return m("div", [m(InfoPanel), m(GameBoard)]);
+    return (
+      <div>
+        <InfoPanel />
+        <GameBoard />
+      </div>
+    );
   }
 }

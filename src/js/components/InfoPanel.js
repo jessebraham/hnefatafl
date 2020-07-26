@@ -14,17 +14,25 @@ const restart = () => {
 // Displays the active team and provides a link for restarting the game.
 class GameActivePanel {
   view() {
-    return m("div", { class: "info-panel" }, [
-      m("div", [
-        m("span", { class: "title flex-1" }, "Hnefatafl"),
-        m("a", { href: "#!/rules" }, "Rules"),
-        m("a", { href: "#!/about", class: "ml-6" }, "About"),
-      ]),
-      m("div", [
-        m("p", [m("span", `${Team.name(Game.activeTeam)}' turn`)]),
-        m("a", { href: "#", onclick: restart }, "Restart"),
-      ]),
-    ]);
+    return (
+      <div class="info-panel">
+        <div>
+          <span class="title flex-1">Hnefatafl</span>
+          <m.route.Link href="/rules">Rules</m.route.Link>
+          <m.route.Link href="/about" class="ml-6">
+            About
+          </m.route.Link>
+        </div>
+        <div>
+          <p>
+            <span>{`${Team.name(Game.activeTeam)}' turn`}</span>
+          </p>
+          <a href="#" onclick={restart}>
+            Restart
+          </a>
+        </div>
+      </div>
+    );
   }
 }
 
@@ -34,22 +42,20 @@ class GameActivePanel {
 // Provides a link for restarting the game.
 class GameOverPanel {
   view() {
-    return m("div", { class: "info-panel" }, [
-      m("div", { class: "flex-col" }, [
-        m(
-          "p",
-          { class: "font-light mb-2 text-center text-2xl tracking-wide" },
-          Game.winningTeam === null
-            ? "Tie!"
-            : `${Team.name(Game.winningTeam)} win!`,
-        ),
-        m(
-          "a",
-          { href: "#", onclick: restart, class: "text-center" },
-          "Restart",
-        ),
-      ]),
-    ]);
+    return (
+      <div class="info-panel">
+        <div class="flex-col">
+          <p class="font-light mb-2 text-center text-2xl tracking-wide">
+            {Game.winningTeam === null
+              ? "Tie!"
+              : `${Team.name(Game.winningTeam)} win!`}
+          </p>
+          <a href="#" class="text-center" onclick={restart}>
+            Restart
+          </a>
+        </div>
+      </div>
+    );
   }
 }
 
